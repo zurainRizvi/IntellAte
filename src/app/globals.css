@@ -382,6 +382,10 @@ html[data-scene="live"] .card-slot {
   width: min(20rem, 28vw);
   display: flex;
   align-items: center;
+  pointer-events: none;
+}
+html[data-scene="live"] .card-slot > * {
+  pointer-events: auto;
 }
 html[data-scene="live"] [data-card] {
   opacity: 0;
