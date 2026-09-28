@@ -159,7 +159,9 @@ export const discGlowFragment = /* glsl */ `
     vec3 col = mix(vec3(1.0, 0.88, 0.72), vec3(0.8, 0.76, 0.74), smoothstep(0.08, 0.6, r));
     // Fade near the camera, where perspective would magnify the noise into visible blobs.
     float near = smoothstep(0.55, 1.1, vDepth);
-    gl_FragColor = vec4(col * light * uIntensity * near * smoothstep(0.05, 0.3, uFacing), 1.0);
+    // Face-on, resolved particles carry the structure; a full-strength plane would blur them.
+    float facingGain = smoothstep(0.05, 0.3, uFacing) * (1.0 - 0.55 * smoothstep(0.55, 0.95, uFacing));
+    gl_FragColor = vec4(col * light * uIntensity * near * facingGain, 1.0);
   }
 `;
 

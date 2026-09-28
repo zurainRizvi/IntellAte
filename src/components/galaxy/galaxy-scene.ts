@@ -168,7 +168,7 @@ export function createGalaxyScene(tier: QualityTier) {
     // Dust reads strongest edge-on, where the optical path through the disc is longest; there,
     // stars inside the dust layer are drawn behind it so the lane stays dark.
     const facing = mat.glow.uniforms.uFacing.value;
-    mat.dust.uniforms.uStrength.value = 1.3 - 1.1 * facing;
+    mat.dust.uniforms.uStrength.value = 1.3 - 1.18 * facing;
     starSplitZ.value = 0.014 * (1 - facing) ** 3;
   }
 

@@ -222,7 +222,9 @@ export function generateGalaxy(tier: QualityTier, seed = 20260928): GalaxyData {
       const x = r * Math.cos(theta);
       const y = r * Math.sin(theta);
       const d = noise(x * 9 + 91, y * 9 - 13);
-      if (rand() < Math.min(1, Math.max(0, (d - 0.3) * 2.5))) break;
+      // Main lanes stay mostly continuous; spurs and filaments stay patchy.
+      const gate = kind < 0.55 ? (d - 0.12) * 2.2 : (d - 0.3) * 2.5;
+      if (rand() < Math.min(1, Math.max(0, gate))) break;
     }
     dust.position.set([r, theta, gauss() * 0.009], i * 3);
     setColor(dust, i, palette.dust, (0.1 + rand() * 0.18) * Math.sqrt(counts.high.dust / n.dust));
