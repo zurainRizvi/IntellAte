@@ -50,10 +50,12 @@ export function IntroOverlay() {
     if (!video || !layer || window.__intellateBoot?.intro !== "play") return;
 
     let finished = false;
+    let startTimeout = 0;
     const timers: number[] = [];
     const finish = (outcome: IntroOutcome, reason: EndReason) => {
       if (finished) return;
       finished = true;
+      clearTimeout(startTimeout);
       timers.forEach(clearTimeout);
       try {
         localStorage.setItem(introStorageKey, "1");
@@ -83,7 +85,7 @@ export function IntroOverlay() {
     };
     const onEnded = () => finish("completed", "ended");
     const onError = () => finish("skipped", "missing");
-    const onPlaying = () => timers.forEach(clearTimeout);
+    const onPlaying = () => clearTimeout(startTimeout);
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && finish("skipped", "user");
     const onVisibility = () => {
       if (document.hidden) video.pause();
@@ -97,7 +99,7 @@ export function IntroOverlay() {
     document.addEventListener("keydown", onKey);
     document.addEventListener("visibilitychange", onVisibility);
 
-    timers.push(window.setTimeout(() => finish("skipped", "slow"), motion.introStartTimeoutMs));
+    startTimeout = window.setTimeout(() => finish("skipped", "slow"), motion.introStartTimeoutMs);
     video.muted = true;
     video.src = pickSource();
     video.currentTime = 0;
@@ -107,6 +109,7 @@ export function IntroOverlay() {
 
     return () => {
       finished = true;
+      clearTimeout(startTimeout);
       timers.forEach(clearTimeout);
       video.removeEventListener("timeupdate", onTime);
       video.removeEventListener("ended", onEnded);
