@@ -1,12 +1,15 @@
 # IntellAte
 
-Local prototype of the IntellAte portfolio: a live real-time galaxy, scroll-controlled orbit,
-one smoke branch, and one project card — with reduced-motion, no-WebGL and no-JavaScript fallbacks.
+Local **digital invitations MVP**: a futuristic galaxy shell, invitation catalogue
+(single- and multi-event), occasions, custom brief, order-request flow, rules-based
+AI Concierge, and a live anonymized flagship preview — **Aurora Safar**.
 
-Brand: **IntellAte** · tagline **IA: Automate the Intellect** · headline **Where Intellectual meets Automations**.
+Brand: **IntellAte** · tagline **IA: Automate the Intellect** · promise
+**Don't find the perfect invitation. Create yours.**
 
-Stack: Next.js 16 (App Router, Turbopack) · React 19 · strict TypeScript · Tailwind CSS 4 · Three.js /
-React Three Fiber · GSAP ScrollTrigger · Zod. Versions are pinned in `package-lock.json`.
+Stack: Next.js 16 (App Router, Turbopack) · React 19 · strict TypeScript · Tailwind CSS 4 ·
+Three.js / React Three Fiber · GSAP ScrollTrigger · Zod · Framer Motion (flagship demo only).
+Versions are pinned in `package-lock.json`.
 
 ## Run locally
 
@@ -21,7 +24,7 @@ Production-style review (drafts visible):
 npm run preview       # builds with SHOW_DRAFT_CONTENT=true and serves on http://localhost:4318
 ```
 
-A plain `npm run build && npm start` hides draft content, so the unverified Rehza card is absent there.
+Optional contact overrides: `CONTACT_EMAIL`, `CONTACT_WHATSAPP` (digits only, country code included).
 
 ## Checks
 
@@ -46,12 +49,21 @@ The lab scripts drive the locally installed Google Chrome through Playwright (`c
 
 ## Layout
 
-- `src/app` — pages, root layout, global styles (static layout is the default; live mode is opt-in via `data-scene`)
+- `src/app` — marketing routes, order Server Action, root layout, global styles
 - `src/components/galaxy` — particle generator, shaders, scene factory, smoke branch, R3F canvas
-- `src/components/journey-timeline.tsx` — the single ScrollTrigger timeline
-- `src/config/motion.ts` — camera poses and timeline spans
-- `src/content` — typed, validated content with server-side draft filtering
+- `src/components/journey-timeline.tsx` — home ScrollTrigger timeline
+- `src/demos/aurora-safar` — anonymized multi-event live preview (fictional couple)
+- `src/content` — typed occasions, designs, profile, contact with server-side draft filtering
 - `scripts/lab/` — capture, compare, check and perf tools
 - `reference-videos/` — local reference footage only (gitignored, never committed)
 
-There is no intro video on the public site. Visitors land directly on the live galaxy.
+## Flagship privacy
+
+The live preview is adapted from a private wedding invitation prototype. Public demo names are
+**Ayaan & Zara**, host **Mrs. Imran Malik**, design **Aurora Safar**. Personal phone numbers are
+never shipped in the demo.
+
+Commerce language: **Request This Design** / **Order Now — Pay After Confirmation** (not COD).
+
+There is no intro video on the public marketing site. Visitors land on the live galaxy; the
+flagship invitation itself is the product demo.

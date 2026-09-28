@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Instrument_Serif } from "next/font/google";
+import { AiConcierge } from "@/components/ai-concierge";
 import { getProfile } from "@/content";
 import { bootScript } from "@/lib/boot-script";
 import "./globals.css";
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to content
         </a>
         {children}
+        <AiConcierge />
       </body>
     </html>
   );

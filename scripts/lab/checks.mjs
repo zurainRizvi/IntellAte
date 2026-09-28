@@ -54,7 +54,7 @@ await check("lands-on-live-galaxy", {}, async (page) => {
       hasIntro === 0 &&
       brand.includes("IntellAte") &&
       tagline.includes("IA: Automate the Intellect") &&
-      headline.includes("Where Intellectual meets Automations"),
+      headline.includes("Digital invitations designed around your story"),
     attrs: a,
     hasIntro,
     brand,
@@ -93,12 +93,12 @@ await check("webgl-context-lost", {}, async (page) => {
 await check("no-js-home", { javaScriptEnabled: false }, async (page) => {
   await page.goto(base + "/");
   const text = await page.locator("main").innerText();
-  const href = await page.locator('main a[href="/contact"]').first().getAttribute("href");
+  const href = await page.locator('main a[href="/invitations"]').first().getAttribute("href");
   const cardVisible = await page.locator("[data-card]").isVisible();
   const hasIntro = await page.locator(".intro-layer, [data-intro-skip]").count();
   return {
     pass: cardVisible && !!href && hasIntro === 0 && /IntellAte/.test(await page.content()),
-    contactHref: href,
+    invitationsHref: href,
     cardVisible,
     hasIntro,
     mainChars: text.length,
@@ -107,9 +107,16 @@ await check("no-js-home", { javaScriptEnabled: false }, async (page) => {
 
 await check("no-js-contact", { javaScriptEnabled: false }, async (page) => {
   const res = await page.goto(base + "/contact");
-  const mailto = await page.locator('a[href^="mailto:"]').count();
+  const orderLink = await page.locator('a[href="/order"]').count();
   const pending = await page.locator(".contact-pending").count();
-  return { pass: res.status() === 200 && mailto + pending > 0, status: res.status(), mailtoLinks: mailto, pendingNote: pending > 0 };
+  const mailto = await page.locator('a[href^="mailto:"]').count();
+  return {
+    pass: res.status() === 200 && (orderLink > 0 || mailto + pending > 0),
+    status: res.status(),
+    orderLinks: orderLink,
+    mailtoLinks: mailto,
+    pendingNote: pending > 0,
+  };
 });
 
 await browser.close();

@@ -1,7 +1,17 @@
 import Link from "next/link";
 import type { NavItem, Profile } from "@/content/schema";
 
-export function SiteHeader({ profile, navigation }: { profile: Profile; navigation: NavItem[] }) {
+export function SiteHeader({
+  profile,
+  navigation,
+  ctaHref = "/custom",
+  ctaLabel = "Create your own",
+}: {
+  profile: Profile;
+  navigation: NavItem[];
+  ctaHref?: string;
+  ctaLabel?: string;
+}) {
   return (
     <header className="site-header">
       <Link href="/" className="wordmark" aria-label={`${profile.brand} — home`}>
@@ -17,8 +27,8 @@ export function SiteHeader({ profile, navigation }: { profile: Profile; navigati
           ))}
         </ul>
       </nav>
-      <Link href="/contact" className="btn btn-primary header-cta">
-        Discuss your project
+      <Link href={ctaHref} className="btn btn-primary header-cta">
+        {ctaLabel}
       </Link>
     </header>
   );

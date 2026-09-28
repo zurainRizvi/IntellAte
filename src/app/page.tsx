@@ -1,14 +1,16 @@
 import Link from "next/link";
-import { getNavigation, getProfile, getVisibleProjects } from "@/content";
-import type { Project } from "@/content/schema";
+import { getNavigation, getProfile, getVisibleDesigns } from "@/content";
+import { DesignCard } from "@/components/design-card";
 import { JourneyTimeline } from "@/components/journey-timeline";
 import { BootAttributes, PauseMotionButton } from "@/components/motion-controls";
 import { SceneMount } from "@/components/scene-mount";
+import { SiteFooter } from "@/components/site-footer";
 import { SiteHeader } from "@/components/site-header";
 
 export default function Home() {
   const profile = getProfile();
-  const [project] = getVisibleProjects();
+  const featured = getVisibleDesigns({ featured: true });
+  const flagship = featured.find((d) => d.flagship) ?? featured[0];
 
   return (
     <>
@@ -29,12 +31,12 @@ export default function Home() {
               </h1>
               <p className="hero-support">{profile.supporting}</p>
               <div className="hero-actions">
-                <Link href="/contact" className="btn btn-primary">
-                  Discuss your project
+                <Link href="/invitations" className="btn btn-primary">
+                  Choose a design
                 </Link>
-                <a href="#work" className="btn btn-ghost">
-                  Explore my journey
-                </a>
+                <Link href="/custom" className="btn btn-ghost">
+                  Create your own
+                </Link>
               </div>
             </div>
 
@@ -46,55 +48,72 @@ export default function Home() {
               <PauseMotionButton className="text-control" />
             </div>
 
-            {project && (
+            {flagship && (
               <div className="card-slot">
-                <ProjectCard project={project} />
+                <article id="work" className="project-card" data-card tabIndex={-1} aria-labelledby="work-title">
+                  <p className="draft-badge">Flagship</p>
+                  <p className="eyebrow">01 / {flagship.eyebrow}</p>
+                  <h2 id="work-title" className="card-title">
+                    {flagship.title}
+                  </h2>
+                  <p className="card-summary">{flagship.summary}</p>
+                  <ul className="card-roles" aria-label="Events">
+                    {flagship.eventLabels.map((label) => (
+                      <li key={label}>{label}</li>
+                    ))}
+                  </ul>
+                  <div className="hero-actions" style={{ marginTop: "1.1rem" }}>
+                    <Link href={`/invitations/${flagship.slug}/preview`} className="btn btn-primary">
+                      Open live preview
+                    </Link>
+                  </div>
+                </article>
               </div>
             )}
           </div>
         </section>
 
+        <section className="content-section" aria-labelledby="featured-title">
+          <p className="eyebrow">Featured invitations</p>
+          <h2 id="featured-title" className="closing-title">
+            Choose a design or create your own
+          </h2>
+          <p className="closing-copy">{profile.promise}</p>
+          <div className="design-grid">
+            {featured.map((design, index) => (
+              <DesignCard key={design.slug} design={design} index={index} />
+            ))}
+          </div>
+          <div className="hero-actions" style={{ marginTop: "2rem" }}>
+            <Link href="/invitations" className="btn btn-ghost">
+              Browse all invitations
+            </Link>
+            <Link href="/occasions" className="btn btn-ghost">
+              Explore occasions
+            </Link>
+          </div>
+        </section>
+
         <section className="closing" aria-labelledby="closing-title">
           <h2 id="closing-title" className="closing-title">
-            What are you trying to solve?
+            {profile.promise}
           </h2>
           <p className="closing-copy">
-            Tell me about the goal, the current process and what is in the way. I will reply with how I would approach
-            it and who should do the work.
+            Template buyers get a quick path. People who want something nobody else has take the custom path —
+            designers refine the concept with you after you request it.
           </p>
           <div className="hero-actions">
-            <Link href="/contact" className="btn btn-primary">
-              Discuss your project
+            <Link href="/custom" className="btn btn-primary">
+              Start a custom design
+            </Link>
+            <Link href="/order" className="btn btn-ghost">
+              Request a design
             </Link>
           </div>
         </section>
       </main>
-      <footer className="site-footer">
-        <p>
-          {profile.brand} · {profile.tagline}
-        </p>
-        <p>Phase 1 prototype — local review only.</p>
-      </footer>
+      <SiteFooter profile={profile} />
       <JourneyTimeline />
     </>
-  );
-}
-
-function ProjectCard({ project }: { project: Project }) {
-  return (
-    <article id="work" className="project-card" data-card tabIndex={-1} aria-labelledby="work-title">
-      {project.meta.status === "draft" && <p className="draft-badge">Draft · awaiting verification</p>}
-      <p className="eyebrow">01 / {project.eyebrow}</p>
-      <h2 id="work-title" className="card-title">
-        {project.title}
-      </h2>
-      <p className="card-summary">{project.summary}</p>
-      <ul className="card-roles" aria-label="My roles">
-        {project.roles.map((role) => (
-          <li key={role}>{role}</li>
-        ))}
-      </ul>
-      <p className="card-pending">{project.pendingNote}</p>
-    </article>
   );
 }
