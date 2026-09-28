@@ -73,7 +73,7 @@ export function createSmokeBranch() {
     const dx = end[0] - c[0];
     const dy = end[1] - c[1];
     const l0 = Math.hypot(dx, dy) || 1;
-    const start: V2 = [c[0] + (dx / l0) * radius * 0.68, c[1] + (dy / l0) * radius * 0.68];
+    const start: V2 = [c[0] + (dx / l0) * radius * 0.52, c[1] + (dy / l0) * radius * 0.52];
     const d: V2 = [end[0] - start[0], end[1] - start[1]];
     const len = Math.hypot(d[0], d[1]) || 1;
     const n: V2 = [-d[1] / len, d[0] / len];
@@ -87,7 +87,7 @@ export function createSmokeBranch() {
     const f1: V2 = [f0[0] + (f3[0] - f0[0]) * 0.35 + n[0] * fl * 0.1, f0[1] + (f3[1] - f0[1]) * 0.35 + n[1] * fl * 0.1];
     const f2: V2 = [f0[0] + (f3[0] - f0[0]) * 0.7, f0[1] + (f3[1] - f0[1]) * 0.7];
 
-    const width = Math.max(8, Math.min(16, (len / f.dpr) * 0.05)) * f.dpr;
+    const width = Math.max(9, Math.min(18, (len / f.dpr) * 0.06)) * f.dpr;
     const pad = width * 4;
     const xs = [start[0], p1[0], p2[0], end[0], f3[0]];
     const ys = [start[1], p1[1], p2[1], end[1], f3[1]];
@@ -108,7 +108,7 @@ export function createSmokeBranch() {
     uniforms.uGrow.value = f.grow * 1.1;
     uniforms.uTime.value = f.time;
     uniforms.uWidth.value = width;
-    uniforms.uOpacity.value = Math.min(1, f.grow * 2.5) * 0.55;
+    uniforms.uOpacity.value = Math.min(1, f.grow * 2.5) * 0.7;
   }
 
   return {

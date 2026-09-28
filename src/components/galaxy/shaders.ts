@@ -192,10 +192,21 @@ export const smokeFragment = /* glsl */ `
   // Returns (distance, t) of the closest sampled point.
   vec2 closest(vec2 p, vec2 a, vec2 b, vec2 c, vec2 d) {
     float best = 1e9; float bt = 0.0;
-    for (int i = 0; i <= 28; i++) {
-      float t = float(i) / 28.0;
+    for (int i = 0; i <= 24; i++) {
+      float t = float(i) / 24.0;
       float dd = distance(p, bez(a, b, c, d, t));
       if (dd < best) { best = dd; bt = t; }
+    }
+    // Refine around the coarse hit so the stem stays continuous instead of stepping per sample.
+    float h = 1.0 / 48.0;
+    for (int i = 0; i < 6; i++) {
+      float ta = clamp(bt - h, 0.0, 1.0);
+      float tb = clamp(bt + h, 0.0, 1.0);
+      float da = distance(p, bez(a, b, c, d, ta));
+      float db = distance(p, bez(a, b, c, d, tb));
+      if (da < best) { best = da; bt = ta; }
+      if (db < best) { best = db; bt = tb; }
+      h *= 0.5;
     }
     return vec2(best, bt);
   }
@@ -206,9 +217,9 @@ export const smokeFragment = /* glsl */ `
     float n = fbm(vec2(t * 9.0 - uTime * 0.25 + seed, dt.x / w * 1.1 + uTime * 0.04));
     float n2 = fbm(p / (width * 1.6) + vec2(-uTime * 0.05, uTime * 0.03) + seed);
     float core = exp(-pow(dt.x / (w * (0.55 + 0.9 * n2)), 2.0) * 1.6);
-    float ends = smoothstep(0.0, 0.2, t) * (1.0 - smoothstep(0.55, 0.95, t));
+    float ends = smoothstep(0.0, 0.14, t) * (1.0 - smoothstep(0.72, 1.0, t));
     float g = 1.0 - smoothstep(grow - 0.1, grow, t);
-    return core * ends * g * smoothstep(0.3, 0.8, n) * (0.55 + 0.7 * n2) * 1.5;
+    return core * ends * g * (0.25 + 0.75 * smoothstep(0.25, 0.75, n)) * (0.55 + 0.7 * n2) * 1.4;
   }
   void main() {
     vec2 p = gl_FragCoord.xy;
