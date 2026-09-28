@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 4317",
     "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
+    "start": "next start --port 4317",
+    "preview": "SHOW_DRAFT_CONTENT=true next build && SHOW_DRAFT_CONTENT=true next start --port 4318",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit",
+    "media:intro": "node scripts/prepare-intro.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "9.8.1",
@@ -26,7 +29,11 @@
     "eslint": "^9",
     "eslint-config-next": "16.3.6",
     "playwright": "1.63.0",
+    "sharp": "0.35.5",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "engines": {
+    "node": ">=20.9"
   }
 }
