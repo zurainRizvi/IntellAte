@@ -44,7 +44,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# locally generated intro derivatives (source footage permission unresolved)
+# local media scratch (not used by the site)
 /public/media/
 
 # test and measurement output

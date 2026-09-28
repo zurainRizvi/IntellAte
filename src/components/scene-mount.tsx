@@ -7,21 +7,15 @@ import { sceneEvents } from "@/lib/scene-state";
 
 const GalaxyCanvas = dynamic(() => import("./galaxy/galaxy-canvas"), { ssr: false });
 
-/** Loads the WebGL scene only in live mode, after the intro has had a head start. */
+/** Loads the WebGL scene only in live mode. */
 export function SceneMount() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     const boot = window.__intellateBoot;
     if (!boot || boot.scene !== "live") return;
-    const mount = () => setMounted(true);
-    const delay = boot.intro === "play" ? 1800 : 0;
-    const timer = window.setTimeout(mount, delay);
-    document.addEventListener(sceneEvents.introEnd, mount);
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener(sceneEvents.introEnd, mount);
-    };
+    const timer = window.setTimeout(() => setMounted(true), 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const onFallback = useCallback((reason: string) => {

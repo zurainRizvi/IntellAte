@@ -75,16 +75,11 @@ function currentPose(layout: Layout, orbit: number, now: number, held: PoseName 
   const P = poses[layout];
   if (held) return P[held];
   const scrolled = lerpPose(P.hero, P.face, ease.inOutSine(orbit));
-  const introPlaying = document.documentElement.dataset.intro === "play";
-  if (!sceneState.entrance && !introPlaying) sceneState.entrance = { kind: "arrival", startedAt: now };
+  if (!sceneState.entrance) sceneState.entrance = { kind: "arrival", startedAt: now };
   const entrance = sceneState.entrance;
-  if (!entrance) return P.match;
   if (entrance.kind === "arrival") {
     const k = (now - entrance.startedAt) / 1000 / motion.arrivalSeconds;
     if (k < 1) return lerpPose(P.arrival, scrolled, ease.outQuart(Math.max(0, k)));
-  } else if (entrance.kind === "settle") {
-    const k = (now - entrance.startedAt) / 1000 / motion.settleSeconds;
-    if (k < 1) return lerpPose(P.match, scrolled, ease.inOutSine(Math.max(0, k)));
   }
   return scrolled;
 }

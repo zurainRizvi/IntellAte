@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Behavioural checks for the intro and fallbacks against a running server.
+ * Behavioural checks for fallbacks against a running server.
  *   node scripts/lab/checks.mjs [outDir]
  * Prints one JSON line per check and writes evidence screenshots to outDir.
  */
@@ -39,75 +39,28 @@ async function check(name, opts, fn) {
 }
 
 const html = (page) => page.evaluate(() => ({ ...document.documentElement.dataset }));
-const introVisible = (page) =>
-  page.evaluate(() => {
-    const el = document.querySelector(".intro-layer");
-    return !!el && getComputedStyle(el).display !== "none" && getComputedStyle(el).visibility !== "hidden";
-  });
 
-await check("skip-from-frame-0", {}, async (page) => {
-  await page.goto(base + "/?intro=play", { waitUntil: "commit" });
-  await page.locator("[data-intro-skip]").click({ timeout: 5000 });
-  const t0 = Date.now();
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 3000 });
-  return { skipToDoneMs: Date.now() - t0, attrs: await html(page) };
-});
-
-await check("escape-skips", {}, async (page) => {
-  await page.goto(base + "/?intro=play");
-  await page.waitForFunction(() => document.querySelector("video")?.currentTime > 0.3, null, { timeout: 8000 });
-  await page.keyboard.press("Escape");
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 3000 });
-  return { outcome: (await html(page)).introOutcome };
-});
-
-await check("plays-to-end-and-crossfades", {}, async (page) => {
-  await page.goto(base + "/?intro=play");
-  await page.waitForFunction(() => document.documentElement.dataset.introOutcome, null, { timeout: 20000 });
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 5000 });
-  const a = await html(page);
-  return { pass: a.introOutcome === "ended" && a.scene === "live", outcome: a.introOutcome, scene: a.scene };
-});
-
-await check("replay", {}, async (page) => {
-  await page.goto(base + "/?intro=skip");
+await check("lands-on-live-galaxy", {}, async (page) => {
+  await page.goto(base + "/");
   await page.waitForSelector("html[data-scene-ready]", { timeout: 20000 });
-  await page.getByRole("button", { name: "Replay intro" }).first().click();
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "play", null, { timeout: 3000 });
-  await page.waitForFunction(() => document.querySelector("video")?.currentTime > 0.5, null, { timeout: 8000 });
-  const visible = await introVisible(page);
-  await page.locator("[data-intro-skip]").click();
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 3000 });
-  return { pass: visible, overlayVisibleDuringReplay: visible };
-});
-
-await check("missing-video", {}, async (page) => {
-  await page.goto(base + "/?intro=play&introsrc=missing");
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 6000 });
   const a = await html(page);
-  return { pass: a.introOutcome === "missing", outcome: a.introOutcome, scene: a.scene };
-});
-
-await check("slow-video-times-out", {}, async (page) => {
-  await page.route("**/media/intro-*.mp4", async (route) => {
-    await new Promise((r) => setTimeout(r, 8000));
-    await route.continue().catch(() => {});
-  });
-  await page.goto(base + "/?intro=play");
-  const t0 = Date.now();
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 8000 });
-  const a = await html(page);
-  return { pass: a.introOutcome === "slow", outcome: a.introOutcome, afterMs: Date.now() - t0 };
-});
-
-await check("autoplay-rejected", {}, async (page) => {
-  await page.addInitScript(() => {
-    HTMLMediaElement.prototype.play = () => Promise.reject(new DOMException("blocked", "NotAllowedError"));
-  });
-  await page.goto(base + "/?intro=play");
-  await page.waitForFunction(() => document.documentElement.dataset.intro === "done", null, { timeout: 5000 });
-  const a = await html(page);
-  return { pass: a.introOutcome === "autoplay-blocked", outcome: a.introOutcome };
+  const hasIntro = await page.locator(".intro-layer, [data-intro-skip], video.intro-video").count();
+  const brand = await page.locator(".hero-brand").innerText();
+  const tagline = await page.locator(".hero-tagline").innerText();
+  const headline = await page.locator("#hero-title").innerText();
+  return {
+    pass:
+      a.scene === "live" &&
+      hasIntro === 0 &&
+      brand.includes("IntellAte") &&
+      tagline.includes("IA: Automate the Intellect") &&
+      headline.includes("Where Intellectual meets Automations"),
+    attrs: a,
+    hasIntro,
+    brand,
+    tagline,
+    headline,
+  };
 });
 
 await check("reduced-motion", { reducedMotion: "reduce" }, async (page) => {
@@ -116,11 +69,11 @@ await check("reduced-motion", { reducedMotion: "reduce" }, async (page) => {
   const a = await html(page);
   const canvas = await page.locator("canvas").count();
   const card = await page.locator("[data-card]").isVisible();
-  return { pass: a.scene === "static" && a.intro === "done" && canvas === 0 && card, attrs: a, canvas, cardVisible: card };
+  return { pass: a.scene === "static" && canvas === 0 && card, attrs: a, canvas, cardVisible: card };
 });
 
 await check("no-webgl", {}, async (page) => {
-  await page.goto(base + "/?webgl=off&intro=skip");
+  await page.goto(base + "/?webgl=off");
   await page.waitForTimeout(1200);
   const a = await html(page);
   const canvas = await page.locator("canvas").count();
@@ -128,9 +81,11 @@ await check("no-webgl", {}, async (page) => {
 });
 
 await check("webgl-context-lost", {}, async (page) => {
-  await page.goto(base + "/?intro=skip");
+  await page.goto(base + "/");
   await page.waitForSelector("html[data-scene-ready]", { timeout: 20000 });
-  await page.evaluate(() => document.querySelector("canvas").getContext("webgl2").getExtension("WEBGL_lose_context").loseContext());
+  await page.evaluate(() =>
+    document.querySelector("canvas").getContext("webgl2").getExtension("WEBGL_lose_context").loseContext(),
+  );
   await page.waitForFunction(() => document.documentElement.dataset.scene === "static", null, { timeout: 4000 });
   return { attrs: await html(page) };
 });
@@ -140,12 +95,12 @@ await check("no-js-home", { javaScriptEnabled: false }, async (page) => {
   const text = await page.locator("main").innerText();
   const href = await page.locator('main a[href="/contact"]').first().getAttribute("href");
   const cardVisible = await page.locator("[data-card]").isVisible();
-  const skipVisible = await page.locator("[data-intro-skip]").isVisible().catch(() => false);
+  const hasIntro = await page.locator(".intro-layer, [data-intro-skip]").count();
   return {
-    pass: cardVisible && !!href && !skipVisible && /IntellAte/.test(await page.content()),
+    pass: cardVisible && !!href && hasIntro === 0 && /IntellAte/.test(await page.content()),
     contactHref: href,
     cardVisible,
-    introShown: skipVisible,
+    hasIntro,
     mainChars: text.length,
   };
 });

@@ -59,7 +59,7 @@ async function measure(p) {
   });
 
   const t0 = Date.now();
-  await page.goto(base + "/?intro=skip", { waitUntil: "load" });
+  await page.goto(base + "/", { waitUntil: "load" });
   await page.waitForSelector("html[data-scene-ready]", { timeout: 60000 });
   const sceneReadyMs = Date.now() - t0;
   await page.waitForTimeout(1500);

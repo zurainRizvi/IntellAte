@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { getNavigation, getProfile, getVisibleProjects } from "@/content";
 import type { Project } from "@/content/schema";
-import { IntroOverlay } from "@/components/intro/intro-overlay";
 import { JourneyTimeline } from "@/components/journey-timeline";
-import { BootAttributes, PauseMotionButton, ReplayIntroButton } from "@/components/motion-controls";
+import { BootAttributes, PauseMotionButton } from "@/components/motion-controls";
 import { SceneMount } from "@/components/scene-mount";
 import { SiteHeader } from "@/components/site-header";
 
@@ -13,7 +12,6 @@ export default function Home() {
 
   return (
     <>
-      <IntroOverlay />
       <BootAttributes />
       <SiteHeader profile={profile} navigation={getNavigation()} />
       <main id="main">
@@ -45,7 +43,6 @@ export default function Home() {
             </p>
 
             <div className="stage-controls live-only">
-              <ReplayIntroButton className="text-control" />
               <PauseMotionButton className="text-control" />
             </div>
 
@@ -69,7 +66,6 @@ export default function Home() {
             <Link href="/contact" className="btn btn-primary">
               Discuss your project
             </Link>
-            <ReplayIntroButton className="btn btn-ghost js-only" />
           </div>
         </section>
       </main>

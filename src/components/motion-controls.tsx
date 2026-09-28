@@ -2,19 +2,7 @@
 
 import { useLayoutEffect, useState } from "react";
 import { applyBootAttributes } from "@/lib/boot-script";
-import { sceneEvents, sceneState } from "@/lib/scene-state";
-
-export function ReplayIntroButton({ className }: { className?: string }) {
-  return (
-    <button
-      type="button"
-      className={className}
-      onClick={() => document.dispatchEvent(new CustomEvent(sceneEvents.introReplay))}
-    >
-      Replay intro
-    </button>
-  );
-}
+import { sceneState } from "@/lib/scene-state";
 
 export function PauseMotionButton({ className }: { className?: string }) {
   const [paused, setPaused] = useState(false);

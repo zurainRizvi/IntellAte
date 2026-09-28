@@ -16,8 +16,8 @@ export type CameraPose = {
 export type Layout = "desktop" | "mobile";
 
 /**
- * `match` reproduces the last frame of the intro footage at height-fit framing:
- * core at 52.4% / 55.8% of the portrait frame, major axis rising to the upper right.
+ * `match` is the calibrated side-view framing used as the mid-point of the
+ * arrival → hero camera path (core near centre, major axis rising upper-right).
  */
 const matchPose: CameraPose = {
   inclination: 73,
@@ -46,16 +46,8 @@ export const poses: Record<Layout, Record<"arrival" | "match" | "hero" | "face",
 
 export const motion = {
   fov: 50,
-  /** Arrival when the intro is skipped or bypassed: side approach, then deceleration. */
+  /** Side approach into the hero framing on first paint. */
   arrivalSeconds: 3.4,
-  /** After a natural intro ending, settle from the footage framing into the hero framing. */
-  settleSeconds: 2.4,
-  introCrossfadeMs: 700,
-  introSkipFadeMs: 320,
-  /** Seconds before the video ends when the crossfade to the live scene begins. */
-  introCrossfadeLead: 0.55,
-  /** Abort the intro if playback has not started within this window. */
-  introStartTimeoutMs: 3500,
   /** Scroll length of the journey stage, in viewport heights. */
   stageLengthVh: 320,
   /** Camera damping toward the scroll target (higher settles faster). */
@@ -69,5 +61,3 @@ export const motion = {
     card: [0.74, 0.9],
   },
 } as const;
-
-export const introStorageKey = "intellate:intro-seen";

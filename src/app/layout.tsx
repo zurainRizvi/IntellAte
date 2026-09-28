@@ -12,7 +12,6 @@ const profile = getProfile();
 export const metadata: Metadata = {
   title: `${profile.brand} · ${profile.tagline}`,
   description: `${profile.headline}. ${profile.supporting}`,
-  // Local prototype: intro footage permission is unresolved, so nothing is indexable.
   robots: { index: false, follow: false },
 };
 

@@ -37,7 +37,7 @@ for (const job of jobs) {
     }, job.scroll);
   }
   if (job.hideUi) {
-    await page.addStyleTag({ content: ".site-header,.hero,.card-slot,.scroll-hint,.stage-controls,.intro-layer{visibility:hidden!important}" });
+    await page.addStyleTag({ content: ".site-header,.hero,.card-slot,.scroll-hint,.stage-controls{visibility:hidden!important}" });
   }
   await page.waitForTimeout(job.wait ?? 1500);
   if (job.info) {
@@ -50,7 +50,6 @@ for (const job of jobs) {
             renderer: ext ? c.getParameter(ext.UNMASKED_RENDERER_WEBGL) : "n/a",
             tier: document.querySelector("[data-tier]")?.getAttribute("data-tier"),
             scene: document.documentElement.dataset.scene,
-            intro: document.documentElement.dataset.intro,
           };
         }),
       ),
