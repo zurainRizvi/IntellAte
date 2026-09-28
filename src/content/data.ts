@@ -3,16 +3,15 @@ import type { ContactSettings, NavItem, Profile, Project } from "./schema";
 export const profile: Profile = {
   meta: {
     status: "draft",
-    evidenceRef: "Master brief §1; display name and brand settled 2026-09-28. Headline wording not yet approved.",
-    lastVerified: "2026-09-28",
+    evidenceRef: "Brand IntellAte settled 2026-09-28. Tagline and headline set from Syed review 2026-09-29.",
+    lastVerified: "2026-09-29",
     displayPermission: "pending",
   },
   brand: "IntellAte",
-  displayName: "Syed Rizvi",
-  location: "Lahore, Pakistan",
-  headline: "Your challenge. The right people. A solution built around you.",
+  tagline: "IA: Automate the Intellect",
+  headline: "Where Intellectual meets Automations",
   supporting:
-    "I combine software engineering, business analysis and quality assurance to turn complex needs into practical solutions—working personally or bringing together trusted specialists.",
+    "Software engineering, business analysis and quality assurance — turning complex needs into practical solutions, personally or with trusted specialists.",
 };
 
 export const projects: Project[] = [

@@ -18,13 +18,41 @@ const messages: Record<EndReason, string> = {
 function pickSource() {
   const override = new URLSearchParams(location.search).get("introsrc");
   if (override === "missing") return "/media/intro-missing.mp4";
-  const wide = window.innerWidth >= 768 && window.innerHeight * window.devicePixelRatio > 1100;
-  return wide ? "/media/intro-1080.mp4" : "/media/intro-720.mp4";
+  // Prefer 1080 on desktop widths; 720 on phones to keep first paint light.
+  return window.innerWidth >= 768 ? "/media/intro-1080.mp4" : "/media/intro-720.mp4";
+}
+
+/** Soft full-bleed fill of the same file; cache makes the second element free. */
+function attachBleed(video: HTMLVideoElement, bleed: HTMLVideoElement) {
+  bleed.muted = true;
+  bleed.playsInline = true;
+  const sync = () => {
+    if (Math.abs(bleed.currentTime - video.currentTime) > 0.08) bleed.currentTime = video.currentTime;
+  };
+  const followPlay = () => void bleed.play().catch(() => {});
+  const followPause = () => bleed.pause();
+  bleed.src = video.currentSrc || video.src;
+  bleed.currentTime = video.currentTime;
+  followPlay();
+  video.addEventListener("timeupdate", sync);
+  video.addEventListener("seeked", sync);
+  video.addEventListener("play", followPlay);
+  video.addEventListener("pause", followPause);
+  return () => {
+    video.removeEventListener("timeupdate", sync);
+    video.removeEventListener("seeked", sync);
+    video.removeEventListener("play", followPlay);
+    video.removeEventListener("pause", followPause);
+    bleed.pause();
+    bleed.removeAttribute("src");
+    bleed.load();
+  };
 }
 
 export function IntroOverlay() {
   const layerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const bleedRef = useRef<HTMLVideoElement>(null);
   const skipRef = useRef<() => void>(() => {});
   const [run, setRun] = useState(0);
   const [status, setStatus] = useState("");
@@ -46,12 +74,21 @@ export function IntroOverlay() {
 
   useEffect(() => {
     const video = videoRef.current;
+    const bleed = bleedRef.current;
     const layer = layerRef.current;
-    if (!video || !layer || window.__intellateBoot?.intro !== "play") return;
+    if (!video || !bleed || !layer || window.__intellateBoot?.intro !== "play") return;
 
     let finished = false;
     let startTimeout = 0;
+    let detachBleed: (() => void) | undefined;
     const timers: number[] = [];
+    const teardownVideo = () => {
+      detachBleed?.();
+      detachBleed = undefined;
+      video.pause();
+      video.removeAttribute("src");
+      video.load();
+    };
     const finish = (outcome: IntroOutcome, reason: EndReason) => {
       if (finished) return;
       finished = true;
@@ -69,9 +106,7 @@ export function IntroOverlay() {
           updateBoot({ intro: "done" });
           layer.style.transition = "";
           layer.style.opacity = "";
-          video.pause();
-          video.removeAttribute("src");
-          video.load();
+          teardownVideo();
         }, fade),
       );
       document.documentElement.dataset.introOutcome = reason;
@@ -103,6 +138,7 @@ export function IntroOverlay() {
     video.muted = true;
     video.src = pickSource();
     video.currentTime = 0;
+    detachBleed = attachBleed(video, bleed);
     video.play().catch((err: unknown) => {
       if (!finished && !(err instanceof DOMException && err.name === "AbortError")) finish("skipped", "autoplay-blocked");
     });
@@ -111,6 +147,7 @@ export function IntroOverlay() {
       finished = true;
       clearTimeout(startTimeout);
       timers.forEach(clearTimeout);
+      teardownVideo();
       video.removeEventListener("timeupdate", onTime);
       video.removeEventListener("ended", onEnded);
       video.removeEventListener("error", onError);
@@ -123,7 +160,26 @@ export function IntroOverlay() {
   return (
     <>
       <div ref={layerRef} className="intro-layer" aria-label="Intro film">
-        <video ref={videoRef} className="intro-video" muted playsInline preload="none" aria-hidden="true" tabIndex={-1} />
+        <video
+          ref={bleedRef}
+          className="intro-video-bleed"
+          muted
+          playsInline
+          preload="none"
+          aria-hidden="true"
+          tabIndex={-1}
+        />
+        <div className="intro-frame">
+          <video
+            ref={videoRef}
+            className="intro-video-frame"
+            muted
+            playsInline
+            preload="none"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
+        </div>
         <button type="button" data-intro-skip className="intro-skip" onClick={() => skipRef.current()}>
           Skip intro
         </button>

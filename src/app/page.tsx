@@ -24,9 +24,8 @@ export default function Home() {
             </div>
 
             <div className="hero" data-hero>
-              <p className="eyebrow">
-                {profile.displayName} · {profile.location}
-              </p>
+              <p className="hero-brand">{profile.brand}</p>
+              <p className="hero-tagline">{profile.tagline}</p>
               <h1 id="hero-title" className="hero-title">
                 {profile.headline}
               </h1>
@@ -76,7 +75,7 @@ export default function Home() {
       </main>
       <footer className="site-footer">
         <p>
-          {profile.brand} · {profile.displayName}
+          {profile.brand} · {profile.tagline}
         </p>
         <p>Phase 1 prototype — local review only.</p>
       </footer>

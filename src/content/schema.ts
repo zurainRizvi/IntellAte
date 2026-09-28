@@ -14,8 +14,8 @@ export const recordMeta = z.object({
 export const profileSchema = z.object({
   meta: recordMeta,
   brand: z.string().min(1),
-  displayName: z.string().min(1),
-  location: z.string().min(1),
+  /** Short company tagline shown under the wordmark and as the hero eyebrow. */
+  tagline: z.string().min(1),
   headline: z.string().min(1),
   supporting: z.string().min(1),
 });

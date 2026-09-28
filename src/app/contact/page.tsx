@@ -16,8 +16,8 @@ export default function ContactPage() {
         <p className="eyebrow">Contact</p>
         <h1 className="closing-title">Discuss your project</h1>
         <p className="closing-copy">
-          Share the goal, how it works today and the main constraint. The reply will make clear who would do the work:{" "}
-          {profile.displayName} personally, a team he assembles, or a specialist he introduces.
+          Share the goal, how it works today and the main constraint. {profile.brand} will reply with how we would
+          approach it — personally, with a team we assemble, or by introducing a specialist.
         </p>
         {contact.email ? (
           <p>

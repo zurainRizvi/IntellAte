@@ -10,8 +10,8 @@ const serif = Instrument_Serif({ variable: "--font-serif-face", subsets: ["latin
 const profile = getProfile();
 
 export const metadata: Metadata = {
-  title: `${profile.displayName} · ${profile.brand}`,
-  description: profile.supporting,
+  title: `${profile.brand} · ${profile.tagline}`,
+  description: `${profile.headline}. ${profile.supporting}`,
   // Local prototype: intro footage permission is unresolved, so nothing is indexable.
   robots: { index: false, follow: false },
 };
@@ -19,6 +19,9 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: "#000000",
   colorScheme: "dark",
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

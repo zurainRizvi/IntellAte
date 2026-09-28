@@ -36,8 +36,8 @@ const median = (a) => {
 };
 
 async function measure(p) {
-  const { name, cpu, network, ...ctx } = p;
-  const context = await browser.newContext(ctx);
+  const { cpu, network, viewport, deviceScaleFactor, isMobile, hasTouch } = p;
+  const context = await browser.newContext({ viewport, deviceScaleFactor, isMobile, hasTouch });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send("Network.enable");

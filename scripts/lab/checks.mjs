@@ -142,7 +142,7 @@ await check("no-js-home", { javaScriptEnabled: false }, async (page) => {
   const cardVisible = await page.locator("[data-card]").isVisible();
   const skipVisible = await page.locator("[data-intro-skip]").isVisible().catch(() => false);
   return {
-    pass: cardVisible && !!href && !skipVisible && /Syed Rizvi/.test(await page.content()),
+    pass: cardVisible && !!href && !skipVisible && /IntellAte/.test(await page.content()),
     contactHref: href,
     cardVisible,
     introShown: skipVisible,

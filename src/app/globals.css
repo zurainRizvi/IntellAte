@@ -27,6 +27,8 @@ html {
 
 body {
   min-height: 100svh;
+  min-height: 100dvh;
+  overflow-x: clip;
 }
 
 :focus-visible {
@@ -67,23 +69,28 @@ html[data-scene="live"] .live-only {
   display: flex;
   align-items: center;
   gap: 2rem;
-  padding: 1.1rem clamp(1.25rem, 4vw, 3.5rem);
+  padding:
+    max(1.1rem, env(safe-area-inset-top))
+    max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-right))
+    1.1rem
+    max(clamp(1.25rem, 4vw, 3.5rem), env(safe-area-inset-left));
   background: linear-gradient(to bottom, rgb(0 0 0 / 0.82), rgb(0 0 0 / 0));
 }
 .wordmark {
   display: flex;
   flex-direction: column;
+  gap: 0.15rem;
   line-height: 1.05;
+  max-width: min(22rem, 52vw);
 }
 .wordmark-brand {
   font-family: var(--font-serif);
-  font-size: 1.45rem;
-  letter-spacing: 0.01em;
+  font-size: clamp(1.85rem, 2.6vw, 2.35rem);
+  letter-spacing: -0.01em;
 }
-.wordmark-name {
-  font-size: 0.68rem;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+.wordmark-tagline {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
   color: var(--color-muted);
 }
 .site-nav {
@@ -102,8 +109,9 @@ html[data-scene="live"] .live-only {
 @media (max-width: 767px) {
   .site-header {
     flex-wrap: wrap;
-    gap: 0.35rem 1rem;
-    padding-block: 0.85rem 1.4rem;
+    row-gap: 0.45rem;
+    column-gap: 0.75rem;
+    padding-block: max(0.85rem, env(safe-area-inset-top)) 1.15rem;
   }
   .site-nav {
     order: 3;
@@ -111,13 +119,31 @@ html[data-scene="live"] .live-only {
     margin-left: 0;
   }
   .site-nav ul {
-    gap: 1.25rem;
+    gap: 1.1rem;
     font-size: 0.8rem;
   }
   .header-cta {
     margin-left: auto;
     font-size: 0.78rem;
     padding: 0.5rem 0.9rem;
+    min-height: 2.5rem;
+  }
+  .hero-actions {
+    width: 100%;
+  }
+  .hero-actions .btn {
+    flex: 1 1 auto;
+    min-width: min(100%, 11rem);
+  }
+  .wordmark {
+    max-width: min(16rem, 58vw);
+  }
+  .wordmark-brand {
+    font-size: clamp(1.55rem, 6.5vw, 1.9rem);
+  }
+  .wordmark-tagline {
+    font-size: 0.62rem;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -182,6 +208,7 @@ html[data-scene="live"] .live-only {
   position: fixed;
   inset: 0;
   z-index: 70;
+  overflow: hidden;
   background: #000;
 }
 html[data-intro="play"] .intro-layer {
@@ -190,31 +217,71 @@ html[data-intro="play"] .intro-layer {
 html[data-intro="play"] body {
   overflow: hidden;
 }
-.intro-video {
+/*
+ * Portrait source (1080×1560), full-bleed on every viewport:
+ *   bleed — cover + center zoom + blur of the same frames, fills the letterbox
+ *   frame — size-boxed to the source aspect so the filmed composition stays sharp
+ *            and Chromium cannot paint an opaque black letterbox over the bleed
+ */
+.intro-video-bleed {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
+  object-position: center center;
+  transform: scale(3.2);
+  filter: blur(52px) brightness(0.88) saturate(1.2);
+  pointer-events: none;
 }
-/* Portrait screens narrower than the 1080×1560 footage: fill the height, crop the sides. */
+.intro-frame {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: min(100vw, calc(100vh * 1080 / 1560));
+  height: min(100vh, calc(100vw * 1560 / 1080));
+  overflow: hidden;
+  background: transparent;
+  /* Soft edge so the sharp film merges into the extended fill. */
+  -webkit-mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 62%, transparent 100%);
+  mask-image: radial-gradient(ellipse 92% 88% at 50% 50%, #000 62%, transparent 100%);
+}
+.intro-video-frame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: transparent;
+}
 @media (max-aspect-ratio: 1080/1560) {
-  .intro-video {
-    object-fit: cover;
+  .intro-frame {
+    width: 100%;
+    height: 100%;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .intro-video-bleed {
+    transform: scale(1.4);
+    filter: blur(28px) brightness(0.75) saturate(1.1);
   }
 }
+
 .intro-skip {
   position: absolute;
-  right: clamp(1rem, 3vw, 2.5rem);
-  bottom: clamp(1rem, 4vh, 2.5rem);
+  z-index: 2;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
   min-height: 2.75rem;
   padding: 0.6rem 1.2rem;
   border: 1px solid rgb(242 233 216 / 0.4);
   border-radius: 999px;
-  background: rgb(0 0 0 / 0.45);
+  background: rgb(0 0 0 / 0.55);
   color: var(--color-ivory);
   font-size: 0.85rem;
   cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 .intro-skip:hover {
   border-color: var(--color-ivory);
@@ -242,15 +309,28 @@ html[data-intro="play"] body {
   position: relative;
 }
 .hero {
-  max-width: 36rem;
+  max-width: 38rem;
+}
+.hero-brand {
+  font-family: var(--font-serif);
+  font-size: clamp(2.8rem, 6vw, 4.6rem);
+  line-height: 0.98;
+  letter-spacing: -0.02em;
+}
+.hero-tagline {
+  margin-top: 0.85rem;
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--color-gold);
 }
 .hero-title {
-  margin-top: 1rem;
+  margin-top: 0.75rem;
   font-family: var(--font-serif);
-  font-size: clamp(2.4rem, 4.6vw, 4.1rem);
-  line-height: 1.02;
+  font-size: clamp(1.85rem, 3.4vw, 2.85rem);
+  line-height: 1.08;
   letter-spacing: -0.01em;
   text-wrap: balance;
+  color: #ebe2d2;
 }
 .hero-support {
   margin-top: 1.25rem;
@@ -347,8 +427,8 @@ html[data-scene="live"] .stage-backdrop {
 html[data-scene="live"] .hero {
   position: absolute;
   left: clamp(1.25rem, 6vw, 5.5rem);
-  top: 21svh;
-  max-width: min(34rem, 42vw);
+  top: 18svh;
+  max-width: min(38rem, 46vw);
 }
 html[data-scene="live"] .hero::before {
   content: "";
@@ -394,26 +474,33 @@ html[data-scene="live"] [data-card] {
 
 @media (max-width: 767px), (max-aspect-ratio: 4/5) {
   html[data-scene="live"] .hero {
-    top: 7.5rem;
-    right: 1.25rem;
+    top: max(7rem, calc(env(safe-area-inset-top) + 5.75rem));
+    left: max(1.25rem, env(safe-area-inset-left));
+    right: max(1.25rem, env(safe-area-inset-right));
     max-width: none;
   }
+  html[data-scene="live"] .hero-brand {
+    font-size: clamp(2.4rem, 11vw, 3.4rem);
+  }
   html[data-scene="live"] .hero-title {
-    font-size: clamp(2rem, 8.6vw, 2.6rem);
+    font-size: clamp(1.45rem, 6.2vw, 1.95rem);
   }
   html[data-scene="live"] .hero-support {
     font-size: 0.92rem;
+    max-width: 34rem;
   }
   html[data-scene="live"] .card-slot {
     top: auto;
-    bottom: 4.2rem;
-    right: 1.25rem;
+    bottom: max(4.2rem, calc(env(safe-area-inset-bottom) + 3.4rem));
+    left: max(1.25rem, env(safe-area-inset-left));
+    right: max(1.25rem, env(safe-area-inset-right));
     width: auto;
   }
   html[data-scene="live"] .stage-controls {
     left: 50%;
     translate: -50% 0;
-    bottom: 0.6rem;
+    bottom: max(0.55rem, env(safe-area-inset-bottom));
+    gap: 1.1rem;
   }
   html[data-scene="live"] .scroll-hint {
     display: none;
@@ -426,8 +513,32 @@ html[data-scene="live"] [data-card] {
     background-image:
       linear-gradient(to bottom, rgb(0 0 0 / 0.2) 0%, rgb(0 0 0 / 0.85) 55%, #000 80%),
       url("/galaxy-poster.webp");
-    background-size: cover, auto 60svh;
-    background-position: center, 60% top;
+    background-size: cover, cover;
+    background-position: center, 60% 18%;
+  }
+  .project-card {
+    padding: 1.35rem 1.25rem 1.2rem;
+  }
+  .card-title {
+    font-size: clamp(1.7rem, 7vw, 2.1rem);
+  }
+}
+
+/* Narrow phones (≤360px): keep CTAs and nav from colliding. */
+@media (max-width: 360px) {
+  .site-nav ul {
+    gap: 0.85rem;
+    font-size: 0.75rem;
+  }
+  .header-cta {
+    font-size: 0.72rem;
+    padding: 0.45rem 0.7rem;
+  }
+  html[data-scene="live"] .hero-brand {
+    font-size: 2.15rem;
+  }
+  html[data-scene="live"] .hero-title {
+    font-size: 1.35rem;
   }
 }
 
