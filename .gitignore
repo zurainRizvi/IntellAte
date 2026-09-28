@@ -1,0 +1,3 @@
+# Ignore all reference video uploads (keep the folder tracked)
+reference-videos/**
+!reference-videos/.gitkeep
