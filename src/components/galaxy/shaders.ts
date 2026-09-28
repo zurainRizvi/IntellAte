@@ -155,7 +155,7 @@ export const discGlowFragment = /* glsl */ `
     float n = fbm(q * 5.5 + 3.0);
     float n2 = fbm(q * 17.0 - 5.0);
     float disc = exp(-r / 0.26) * (1.0 - smoothstep(0.45, 0.95, r));
-    float light = disc * (0.45 + 0.55 * arm * (0.8 + 0.4 * n)) * (0.8 + 0.4 * n2);
+    float light = disc * (0.45 + 0.55 * arm * (0.9 + 0.2 * n)) * (0.8 + 0.4 * n2);
     vec3 col = mix(vec3(1.0, 0.88, 0.72), vec3(0.8, 0.76, 0.74), smoothstep(0.08, 0.6, r));
     // Fade near the camera, where perspective would magnify the noise into visible blobs.
     float near = smoothstep(0.55, 1.1, vDepth);
@@ -199,13 +199,14 @@ export const smokeFragment = /* glsl */ `
   }
   float plume(vec2 p, vec2 dt, float grow, float width, float seed) {
     float t = dt.y;
-    float w = width * mix(0.55, 1.6, t);
-    float n = fbm(vec2(t * 7.0 - uTime * 0.22 + seed, dt.x / w * 1.3 + uTime * 0.05));
-    float n2 = fbm(p / (width * 2.2) + vec2(-uTime * 0.03, uTime * 0.02) + seed);
-    float core = exp(-pow(dt.x / (w * (0.7 + 0.8 * n2)), 2.0) * 1.4);
-    float ends = smoothstep(0.0, 0.12, t) * (1.0 - smoothstep(0.62, 1.0, t));
+    float w = width * mix(0.5, 1.9, t);
+    // Two flowing noise fields: one streams along the stem, one breaks the edges into wisps.
+    float n = fbm(vec2(t * 9.0 - uTime * 0.25 + seed, dt.x / w * 1.1 + uTime * 0.04));
+    float n2 = fbm(p / (width * 1.6) + vec2(-uTime * 0.05, uTime * 0.03) + seed);
+    float core = exp(-pow(dt.x / (w * (0.55 + 0.9 * n2)), 2.0) * 1.6);
+    float ends = smoothstep(0.0, 0.2, t) * (1.0 - smoothstep(0.55, 0.95, t));
     float g = 1.0 - smoothstep(grow - 0.1, grow, t);
-    return core * ends * g * smoothstep(0.25, 0.75, n) * 1.35;
+    return core * ends * g * smoothstep(0.3, 0.8, n) * (0.55 + 0.7 * n2) * 1.5;
   }
   void main() {
     vec2 p = gl_FragCoord.xy;

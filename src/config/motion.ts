@@ -34,13 +34,13 @@ export const poses: Record<Layout, Record<"arrival" | "match" | "hero" | "face",
     arrival: { inclination: 88, azimuth: -38, roll: -80, distance: 0.62, screenX: 0.5, screenY: 0.5, targetOffset: 0.38 },
     match: matchPose,
     hero: { ...matchPose, screenX: 0.6, distance: 0.95 },
-    face: { inclination: 14, azimuth: 42, roll: -6, distance: 2.3, screenX: 0.64, screenY: 0.5, targetOffset: 0 },
+    face: { inclination: 14, azimuth: 42, roll: -6, distance: 2.3, screenX: 0.66, screenY: 0.5, targetOffset: 0 },
   },
   mobile: {
     arrival: { inclination: 88, azimuth: -38, roll: -80, distance: 0.7, screenX: 0.5, screenY: 0.5, targetOffset: 0.38 },
     match: matchPose,
-    hero: { ...matchPose, screenY: 0.6, distance: 1.0 },
-    face: { inclination: 16, azimuth: 42, roll: -6, distance: 4.6, screenX: 0.5, screenY: 0.33, targetOffset: 0 },
+    hero: { ...matchPose, screenX: 0.56, screenY: 0.8, distance: 1.4 },
+    face: { inclination: 16, azimuth: 42, roll: -6, distance: 4.6, screenX: 0.5, screenY: 0.3, targetOffset: 0 },
   },
 };
 

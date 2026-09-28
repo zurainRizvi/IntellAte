@@ -327,6 +327,7 @@ html[data-intro="play"] body {
 }
 .stage-controls {
   gap: 1.5rem;
+  white-space: nowrap;
 }
 
 /* ---------- Stage: live layout ---------- */
@@ -411,7 +412,11 @@ html[data-scene="live"] [data-card] {
     bottom: 0.6rem;
   }
   html[data-scene="live"] .scroll-hint {
-    bottom: 3.2rem;
+    display: none;
+  }
+  html[data-scene="live"] .hero::before {
+    inset: -8rem -1.25rem -3rem;
+    background: linear-gradient(to bottom, rgb(0 0 0 / 0.85) 55%, rgb(0 0 0 / 0));
   }
   .stage-backdrop {
     background-image:
