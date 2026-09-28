@@ -12,11 +12,11 @@ React Three Fiber · GSAP ScrollTrigger · Zod. Versions are pinned in `package-
 
 ```bash
 npm install
-npm run media:intro   # builds public/media/intro-{1080,720}.mp4 from reference-videos/ (needs ffmpeg + ffprobe)
+npm run media:intro   # builds public/media/intro-{1080,720}.mp4 from reference-videos/ (needs ffmpeg)
 npm run dev           # http://localhost:4317
 ```
 
-`media:intro` looks for `ffmpeg`/`ffprobe` on `PATH`, or `FFMPEG` / `FFPROBE` environment variables.
+`media:intro` uses `ffmpeg` on `PATH`, or the binary named by `FFMPEG_PATH`.
 Without the derived videos the intro reports "missing" and the site opens directly on the galaxy.
 
 Production-style review (drafts visible):
